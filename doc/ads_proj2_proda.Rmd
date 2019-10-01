@@ -40,6 +40,6 @@ data$Penalty[is.na(data$Penalty)] <- 0
 
 ```{r}
 #export data
-write.csv(data, file="../data/processed_data")
+write.csv(data, file="../data/processed_data.csv")
 ```
 

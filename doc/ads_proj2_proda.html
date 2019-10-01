@@ -430,7 +430,7 @@ data$CaseStatus[data$CaseStatus == &quot;Rejected-&quot;] &lt;- &quot;Rejected&q
 <pre class="r"><code>#transfer na to 0 for penalty
 data$Penalty[is.na(data$Penalty)] &lt;- 0</code></pre>
 <pre class="r"><code>#export data
-write.csv(data, file=&quot;../data/processed_data&quot;)</code></pre>
+write.csv(data, file=&quot;../data/processed_data.csv&quot;)</code></pre>
 
 
 
