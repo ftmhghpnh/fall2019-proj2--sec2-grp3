@@ -18,7 +18,7 @@ library(plotly)
 lit <- read.csv("../data/processed_data.csv")
 
 lit_landlord <- lit %>% group_by(BuildingID) %>% tally()
-lit_geo <- lit %>% dplyr::select(BuildingID, Latitude, Longitude, StreetName, HouseNumber)
+lit_geo <- lit %>% dplyr::select(BuildingID, Latitude, Longitude, StreetName, HouseNumber, Respondent)
 lit_landlord_geo <- left_join(lit_landlord, lit_geo, by = "BuildingID") %>% distinct()
 
 ```
@@ -66,8 +66,12 @@ server <- function(input, output){
          lng = ~ Longitude,
          lat = ~ Latitude,
          popup = ~ paste0(
-          "Address: ", HouseNumber, " ", StreetName, "<br/>Litigations: " , n
-         )
+          "Address: ", HouseNumber, " ", StreetName, "<br/>Litigations: " , n, "<br/>Most Recent Respondent: " , Respondent
+         ),
+         radius = 4,
+         color = "lightblue",
+         fillColor = "white",
+         opacity = 0.5
        )
    })
    
