@@ -32,7 +32,7 @@ ui <- fluidPage(
     
     sidebarPanel(
        sliderInput("numlit", "Amount of litigations",  min = min(lit_landlord$n), max = max(lit_landlord$n), value = 25 ), 
-       actionButton("building","Building Details"),
+       actionButton("building","See/Update Building Details"),
        verbatimTextOutput("describe"),
        br(),
        plotlyOutput("histogram", height = 350),
@@ -61,7 +61,7 @@ server <- function(input, output){
        setView(lng = -73.9588,
                lat = 40.74 ,
                zoom = 11) %>%
-       addProviderTiles("Stamen.TonerLite") %>%
+       addProviderTiles("CartoDB.Positron") %>%
        addCircleMarkers(
          lng = ~ Longitude,
          lat = ~ Latitude,
@@ -76,7 +76,7 @@ server <- function(input, output){
    })
    
    output$describe <- renderText({
-     paste("Choose a building and click button to see details")
+     paste("Click on map to choose a building")
    })
    
    observe({
@@ -103,7 +103,7 @@ server <- function(input, output){
      ts <- ggplot(ts_data, aes(x = Year, y = `Number of litigation`)) +
        geom_bar(stat = "identity") +
        ggtitle("Amount of Litigations in each year") +
-       labs(x = "Years", y = "Number of litigation") 
+       labs(x = "Years", y = "Number of litigation") +coord_flip()
      ts <- ggplotly(ts)
      ts
    })
