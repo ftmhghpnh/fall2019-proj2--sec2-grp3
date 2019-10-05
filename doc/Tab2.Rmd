@@ -1,0 +1,151 @@
+---
+title: "Tab 2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(leaflet)
+library(shiny)
+library(plotly)
+
+lit <- read.csv("../data/processed_data.csv")
+
+lit_landlord <- lit %>% group_by(BuildingID) %>% tally()
+lit_geo <- lit %>% dplyr::select(BuildingID, Latitude, Longitude, StreetName, HouseNumber)
+lit_landlord_geo <- left_join(lit_landlord, lit_geo, by = "BuildingID") %>% distinct()
+
+```
+
+```{r}
+ui <- fluidPage(
+  
+  h1("Litigations of each Building"),
+  
+  sidebarLayout(
+    
+    sidebarPanel(
+       sliderInput("numlit", "Amount of litigations",  min = min(lit_landlord$n), max = max(lit_landlord$n), value = 25 ), 
+       actionButton("building","Building Details"),
+       verbatimTextOutput("describe"),
+       br(),
+       plotlyOutput("histogram", height = 350),
+       br(),
+       plotlyOutput("pie", height = 300)
+    ),
+    
+    mainPanel(
+      leafletOutput("mymap",height = 800)
+    )
+    
+  )
+)
+```
+
+
+```{r}
+server <- function(input, output){
+
+   output$mymap <- renderLeaflet({
+     
+     data <- filter(lit_landlord_geo, n>= input$numlit)
+     
+     m <- leaflet(data = data) %>%
+       addTiles() %>%
+       setView(lng = -73.9588,
+               lat = 40.74 ,
+               zoom = 11) %>%
+       addProviderTiles("Stamen.TonerLite") %>%
+       addCircleMarkers(
+         lng = ~ Longitude,
+         lat = ~ Latitude,
+         popup = ~ paste0(
+          "Address: ", HouseNumber, " ", StreetName, "<br/>Litigations: " , n
+         )
+       )
+   })
+   
+   output$describe <- renderText({
+     paste("Choose a building and click button to see details")
+   })
+   
+   observe({
+     posi <<- reactive({
+       input$mymap_marker_click
+     })
+   })
+
+   observeEvent(input$building,{
+     
+     if(input$building){
+     plot_data <- dplyr::filter(lit, Latitude==posi()$lat, Longitude==posi()$lng)
+     
+        output$histogram <- renderPlotly({
+                     if (nrow(plot_data) == 0) {
+        return(NULL)
+      }
+     ts_data <- plot_data
+     ts_data$CaseOpenDate <-
+       as.Date(ts_data$CaseOpenDate) %>% format("%Y")
+     ts_data <- group_by(ts_data, CaseOpenDate) %>% tally()
+     colnames(ts_data) <- c("Year", "Number of litigation")
+     
+     ts <- ggplot(ts_data, aes(x = Year, y = `Number of litigation`)) +
+       geom_bar(stat = "identity") +
+       ggtitle("Amount of Litigations in each year") +
+       labs(x = "Years", y = "Number of litigation") 
+     ts <- ggplotly(ts)
+     ts
+   })
+
+   output$pie <- renderPlotly({
+           if (nrow(plot_data) == 0) {
+        return(NULL)
+      }
+      plot_ly() %>%
+       add_pie(
+         data = count(plot_data, CaseType),
+         labels = ~ CaseType,
+         values = ~ n,
+         name = "Litigation by case types",
+         domain = list(x = c(0, 0.45), y = c(0, 1))
+       ) %>%
+       add_pie(
+         data = count(plot_data, CaseStatus),
+         labels = ~ CaseStatus,
+         values = ~ n,
+         name = "Status of the litigation",
+         domain = list(x = c(0.55, 1), y = c(0, 1))
+       ) %>%
+       layout(
+         title = "Litigation details (type and case status)",
+         showlegend = F,
+         xaxis = list(
+           showgrid = FALSE,
+           zeroline = FALSE,
+           showticklabels = FALSE
+         ),
+         yaxis = list(
+           showgrid = FALSE,
+           zeroline = FALSE,
+           showticklabels = FALSE
+         )
+       )
+      
+   })
+   
+     }
+     
+   })
+
+}
+
+shinyApp(ui, server)
+
+```
