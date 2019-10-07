@@ -15,11 +15,11 @@ library(leaflet)
 library(shiny)
 library(plotly)
 
-lit <- read.csv("../data/processed_data.csv")
+lit <- read.csv("../data/processed_data.csv") %>% na.omit()
 
-lit_landlord <- lit %>% group_by(BuildingID) %>% tally()
+lit_building <- lit %>% group_by(BuildingID) %>% tally()
 lit_geo <- lit %>% dplyr::select(BuildingID, Latitude, Longitude, StreetName, HouseNumber, Respondent)
-lit_landlord_geo <- left_join(lit_landlord, lit_geo, by = "BuildingID") %>% distinct()
+lit_building_geo <- left_join(lit_building, lit_geo, by = "BuildingID") %>% distinct()
 
 ```
 
@@ -31,17 +31,17 @@ ui <- fluidPage(
   sidebarLayout(
     
     sidebarPanel(
-       sliderInput("numlit", "Amount of litigations",  min = min(lit_landlord$n), max = max(lit_landlord$n), value = 25 ), 
-       actionButton("building","See/Update Building Details"),
-       verbatimTextOutput("describe"),
+       sliderInput("numlit_t2", "Amount of litigations",  min = min(lit_building$n), max = max(lit_building$n), value = 25 ), 
+       actionButton("building_t2","See/Update Building Details"),
+       textOutput("describe_t2"),
        br(),
-       plotlyOutput("histogram", height = 350),
+       plotlyOutput("histogram_t2", height = 350),
        br(),
-       plotlyOutput("pie", height = 300)
+       plotlyOutput("pie_t2", height = 300)
     ),
     
     mainPanel(
-      leafletOutput("mymap",height = 800)
+      leafletOutput("mymap_t2",height = 800)
     )
     
   )
@@ -52,9 +52,9 @@ ui <- fluidPage(
 ```{r}
 server <- function(input, output){
 
-   output$mymap <- renderLeaflet({
+   output$mymap_t2 <- renderLeaflet({
      
-     data <- filter(lit_landlord_geo, n>= input$numlit)
+     data <- filter(lit_building_geo, n>= input$numlit_t2)
      
      m <- leaflet(data = data) %>%
        addTiles() %>%
@@ -75,25 +75,25 @@ server <- function(input, output){
        )
    })
    
-   output$describe <- renderText({
-     paste("Click on map to choose a building")
+   output$describe_t2 <- renderText({
+     paste("Click on map to choose a building, displays info on all buildings if no building selected")
    })
    
    observe({
      posi <<- reactive({
-       input$mymap_marker_click
+       input$mymap_t2_marker_click
      })
    })
 
-   observeEvent(input$building,{
+   observeEvent(input$building_t2,{
      
-     if(input$building){
-     plot_data <- dplyr::filter(lit, Latitude==posi()$lat, Longitude==posi()$lng)
+     if(input$building_t2){
+       if(is.null(posi())){
+         plot_data <- lit
+       } else{
+          plot_data <- dplyr::filter(lit, Latitude==posi()$lat, Longitude==posi()$lng)}
      
-        output$histogram <- renderPlotly({
-                     if (nrow(plot_data) == 0) {
-        return(NULL)
-      }
+        output$histogram_t2 <- renderPlotly({
      ts_data <- plot_data
      ts_data$CaseOpenDate <-
        as.Date(ts_data$CaseOpenDate) %>% format("%Y")
@@ -108,10 +108,7 @@ server <- function(input, output){
      ts
    })
 
-   output$pie <- renderPlotly({
-           if (nrow(plot_data) == 0) {
-        return(NULL)
-      }
+   output$pie_t2 <- renderPlotly({
       plot_ly() %>%
        add_pie(
          data = count(plot_data, CaseType),
