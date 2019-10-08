@@ -15,12 +15,11 @@ library(leaflet)
 library(shiny)
 library(plotly)
 
-lit <- read.csv("../data/processed_data.csv") %>% na.omit()
+load('../output/processed_data.RData') 
+data <- data %>% na.omit()
 
-lit_building <- lit %>% group_by(BuildingID) %>% tally()
-lit_geo <- lit %>% dplyr::select(BuildingID, Latitude, Longitude, StreetName, HouseNumber, Respondent)
-lit_building_geo <- left_join(lit_building, lit_geo, by = "BuildingID") %>% distinct()
-
+load('../output/building_geo.RData') 
+building_geo <- building_geo %>% distinct()
 ```
 
 ```{r}
@@ -31,11 +30,11 @@ ui <- fluidPage(
   sidebarLayout(
     
     sidebarPanel(
-       sliderInput("numlit_t2", "Amount of litigations",  min = 5, max = max(lit_building$n), value = 25 ), 
+       sliderInput("numlit_t2", "Amount of litigations",  min = 5, max = max(building_geo$n), value = 25 ), 
        actionButton("building_t2","See/Update Building Details"),
        textOutput("describe_t2"),
        br(),
-       plotlyOutput("histogram_t2", height = 350),
+       plotlyOutput("histogram_t2", height = 250),
        br(),
        plotlyOutput("pie_t2", height = 300)
     ),
@@ -54,7 +53,7 @@ server <- function(input, output){
 
    output$mymap_t2 <- renderLeaflet({
      
-     data <- filter(lit_building_geo, n>= input$numlit_t2)
+     data <- filter(building_geo, n>= input$numlit_t2)
      
      m <- leaflet(data = data) %>%
        addTiles() %>%
@@ -89,9 +88,9 @@ server <- function(input, output){
      
      if(input$building_t2){
        if(is.null(posi())){
-         plot_data <- lit
+         plot_data <- data
        } else{
-          plot_data <- dplyr::filter(lit, Latitude==posi()$lat, Longitude==posi()$lng)}
+          plot_data <- dplyr::filter(data, Latitude==posi()$lat, Longitude==posi()$lng)}
      
         output$histogram_t2 <- renderPlotly({
      ts_data <- plot_data
