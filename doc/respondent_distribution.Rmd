@@ -31,7 +31,7 @@ ui <- fluidPage(
     
     sidebarPanel(
        textInput("text", label = h3("Search"), value = "Enter Respondent"),
-       actionButton("search","Search"),
+       actionButton( "search","Search"),
        br(),
        plotlyOutput("histogram", height = 350)
     ),
@@ -67,8 +67,7 @@ server <- function(input, output) {
           StreetName,
           "<br/>Litigations: " ,
           n,
-          "<br/>Most Recent Respondent: " ,
-          Respondent
+
         ),
         radius = 4,
         color = "red",
@@ -99,7 +98,7 @@ server <- function(input, output) {
              aes(x = `Number of litigations`, y = `Number of buildings`)) +
       geom_bar(stat = "identity") +
       ggtitle("Histogram of buildings per litigation number") +
-      labs(x = "Number of litigations", y = "Number of buildings") + coord_flip()
+      labs(x = "Number of litigations", y = "Number of buildings") #+ coord_flip()
     ts <- ggplotly(ts)
     ts
   })
