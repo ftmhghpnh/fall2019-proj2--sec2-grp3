@@ -14,9 +14,6 @@ library(tidyverse)
 library(leaflet)
 library(shiny)
 library(plotly)
-library(rsconnect)
-
-rsconnect::setAccountInfo(name='sh3799', token='7425C348E13D0F51EE54B2ADB3868F77', secret='dC8/RBZ8ga9DTNi9D1lluIgDFAfzBfAGmvM8Eqcv')
 
 lit <- read.csv("../data/processed_data.csv") %>% na.omit()
 
@@ -34,7 +31,7 @@ ui <- fluidPage(
   sidebarLayout(
     
     sidebarPanel(
-       sliderInput("numlit_t2", "Amount of litigations",  min = min(lit_building$n), max = max(lit_building$n), value = 25 ), 
+       sliderInput("numlit_t2", "Amount of litigations",  min = 5, max = max(lit_building$n), value = 25 ), 
        actionButton("building_t2","See/Update Building Details"),
        textOutput("describe_t2"),
        br(),
