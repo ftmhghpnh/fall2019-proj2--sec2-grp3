@@ -14,6 +14,9 @@ library(tidyverse)
 library(leaflet)
 library(shiny)
 library(plotly)
+library(rsconnect)
+
+rsconnect::setAccountInfo(name='sh3799', token='7425C348E13D0F51EE54B2ADB3868F77', secret='dC8/RBZ8ga9DTNi9D1lluIgDFAfzBfAGmvM8Eqcv')
 
 lit <- read.csv("../data/processed_data.csv") %>% na.omit()
 
