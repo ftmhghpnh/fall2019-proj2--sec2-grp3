@@ -15,11 +15,10 @@ library(leaflet)
 library(shiny)
 library(plotly)
 
-lit <- read.csv("../data/processed_data.csv")
-
-lit_landlord <- lit %>% group_by(BuildingID) %>% tally()
-lit_geo <- lit %>% dplyr::select(BuildingID, Latitude, Longitude, StreetName, HouseNumber, Respondent)
-lit_landlord_geo <- left_join(lit_landlord, lit_geo, by = "BuildingID")
+load('../output/processed_data.RData')
+data <- data %>% na.omit()
+load('../output/building_geo.RData')
+building_geo <- building_geo
 ```
 
 ```{r}
@@ -30,14 +29,14 @@ ui <- fluidPage(
   sidebarLayout(
     
     sidebarPanel(
-       textInput("text", label = h3("Search"), value = "Enter Respondent"),
-       actionButton( "search","Search"),
+       textInput("text_t3", label = h3("Search"), value = "Enter Respondent"),
+       actionButton( "search_t3","Search"),
        br(),
-       plotlyOutput("histogram", height = 350)
+       plotlyOutput("histogram_t3", height = 350)
     ),
     
     mainPanel(
-      leafletOutput("mymap",height = 800)
+      leafletOutput("mymap_t3",height = 800)
     )
     
   )
@@ -48,9 +47,9 @@ ui <- fluidPage(
 ```{r}
 server <- function(input, output) {
   
-  output$mymap <- renderLeaflet({
-    input$search
-    data <- filter(lit_landlord_geo, Respondent == isolate(input$text))
+  output$mymap_t3 <- renderLeaflet({
+    input$search_t3
+    data <- filter(building_geo, Respondent == isolate(input$text_t3))
     m <- leaflet(data = data) %>%
       addTiles() %>%
       setView(lng = -73.9588,
@@ -66,7 +65,7 @@ server <- function(input, output) {
           " ",
           StreetName,
           "<br/>Litigations: " ,
-          n,
+          n
 
         ),
         radius = 4,
@@ -78,9 +77,9 @@ server <- function(input, output) {
   
   
   
-  output$histogram <- renderPlotly({
-    input$search
-    data <- filter(lit_landlord_geo, Respondent == isolate(input$text))
+  output$histogram_t3 <- renderPlotly({
+    input$search_t3
+    data <- filter(building_geo, Respondent == isolate(input$text_t3))
     if (nrow(data) == 0) {
       return(NULL)
     }
