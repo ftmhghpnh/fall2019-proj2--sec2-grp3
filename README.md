@@ -1,9 +1,9 @@
 # Project 2: Shiny App Development Version 2.0
 
-## Project Title: 
+## Project Title: Housing Litigations
 Term: Fall 2019
 
-+ Team #
++ Team # 3
 + **Projec title**: + Team members
 	+ team member 1
 	+ team member 2
