@@ -85,7 +85,6 @@ server=function(input, output) {
                   fillOpacity = 0.8,
                   fillColor = pal(subdat1$frequence),
                   label = ~paste0("Zipcode:", ZIPCODE,
-                                  #"Boro Number", Boro,
                                   "Case Frequence: ", frequence),
                   highlight = highlightOptions(weight = 10,
                                        color = "White",
