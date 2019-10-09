@@ -25,7 +25,6 @@ library(httr)
 load('../output/processed_data.RData') 
 
 load('../output/building_geo.RData') 
-load('../output/building_geo_t2.RData')
 
 under <- readOGR("../data/ZIP_CODE_040114.shp")
 
