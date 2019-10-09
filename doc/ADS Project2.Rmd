@@ -80,6 +80,8 @@ server = function(input, output) {
     )
     subdat1 <- spTransform(under2, CRS("+init=epsg:4326"))
     subdat1@data$frequence <- as.numeric(subdat1@data$frequence)
+    subdat1$lab <- paste("<p>", "ZIPCODE: ", subdat1$ZIPCODE, "<p>",
+                         "<p>", "Number of litigations: ", subdat1$frequence, "<p>")    
     
     pal <- colorNumeric(palette = "Blues",
                         domain = subdat1$frequence)
@@ -96,8 +98,7 @@ server = function(input, output) {
         color = "white",
         fillOpacity = 0.8,
         fillColor = pal(subdat1$frequence),
-        label = ~ paste0("Zipcode:", ZIPCODE,
-                         "Number of Cases: ", frequence),
+        label = lapply(subdat1$lab, HTML),
         highlight = highlightOptions(
           weight = 10,
           color = "White",

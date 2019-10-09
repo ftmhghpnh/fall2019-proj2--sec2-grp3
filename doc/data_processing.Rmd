@@ -36,6 +36,7 @@ data$Penalty[is.na(data$Penalty)] <- 0
 
 ```{r}
 #export data
+data <- na.omit(data)
 save(data, file="../output/processed_data.Rdata")
 
 building <- data %>% group_by(BuildingID) %>% tally()

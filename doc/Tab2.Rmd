@@ -15,11 +15,10 @@ library(leaflet)
 library(shiny)
 library(plotly)
 
-load('../output/processed_data.RData') 
-data <- data %>% na.omit()
+load('../output/processed_data.RData')
 
 load('../output/building_geo.RData') 
-building_geo <- building_geo %>% distinct()
+building_geo <- building_geo %>% distinct(BuildingID, .keep_all=T)
 ```
 
 ```{r}
@@ -68,7 +67,7 @@ server <- function(input, output){
           "Address: ", HouseNumber, " ", StreetName, "<br/>Litigations: " , n, "<br/>Most Recent Respondent: " , Respondent
          ),
          radius = 4,
-         color = "lightblue",
+         color = "blue",
          fillColor = "white",
          opacity = 0.5
        )
