@@ -1,168 +1,252 @@
-library(shiny)
-library(choroplethr)
-library(choroplethrZip)
-library(dplyr)
+
+
+library(tidyverse)
 library(leaflet)
-library(maps)
+library(shiny)
+library(plotly)
 library(rgdal)
+library(raster)
+library(tigris)
+library(sp)
+library(ggmap)
+library(maptools)
+library(broom)
+library(httr)
 
-## Define Manhattan's neighborhood
-man.nbhd=c("all neighborhoods", "Central Harlem", 
-           "Chelsea and Clinton",
-           "East Harlem", 
-           "Gramercy Park and Murray Hill",
-           "Greenwich Village and Soho", 
-           "Lower Manhattan",
-           "Lower East Side", 
-           "Upper East Side", 
-           "Upper West Side",
-           "Inwood and Washington Heights")
-zip.nbhd=as.list(1:length(man.nbhd))
-zip.nbhd[[1]]=as.character(c(10026, 10027, 10030, 10037, 10039))
-zip.nbhd[[2]]=as.character(c(10001, 10011, 10018, 10019, 10020))
-zip.nbhd[[3]]=as.character(c(10036, 10029, 10035))
-zip.nbhd[[4]]=as.character(c(10010, 10016, 10017, 10022))
-zip.nbhd[[5]]=as.character(c(10012, 10013, 10014))
-zip.nbhd[[6]]=as.character(c(10004, 10005, 10006, 10007, 10038, 10280))
-zip.nbhd[[7]]=as.character(c(10002, 10003, 10009))
-zip.nbhd[[8]]=as.character(c(10021, 10028, 10044, 10065, 10075, 10128))
-zip.nbhd[[9]]=as.character(c(10023, 10024, 10025))
-zip.nbhd[[10]]=as.character(c(10031, 10032, 10033, 10034, 10040))
+load('../output/processed_data.RData')
 
-## Load housing data
-load("../output/count.RData")
-load("../output/mh2009use.RData")
+load('../output/building_geo.RData')
+load('../output/building_geo_t2.RData')
 
-# Define server logic required to draw a histogram
+
+under <- readOGR("../data/ZIP_CODE_040114.shp")
+
+
 shinyServer(function(input, output) {
+  ## Tab 1 output
   
-  ## Neighborhood name
-  output$text = renderText({"Selected:"})
-  output$text1 = renderText({
-      paste("{ ", man.nbhd[as.numeric(input$nbhd)+1], " }")
-  })
-  
-  ## Panel 1: summary plots of time trends, 
-  ##          unit price and full price of sales. 
-  
-  output$distPlot <- renderPlot({
+  output$mymap1 <- renderLeaflet({
+    data$CaseOpenDate <- as.Date(data$CaseOpenDate) %>% format("%Y")
+    datasliced <-
+      dplyr::filter(
+        data,
+        data$CaseType == input$Zip_frequence,
+        data$CaseOpenDate == input$CaseOpenDate
+      )
     
-    ## First filter data for selected neighborhood
-    mh2009.sel=mh2009.use
-    if(input$nbhd>0){
-      mh2009.sel=mh2009.use%>%
-                  filter(region %in% zip.nbhd[[as.numeric(input$nbhd)]])
-    }
-    
-    ## Monthly counts
-    month.v=as.vector(table(mh2009.sel$sale.month))
-    
-    ## Price: unit (per sq. ft.) and full
-    type.price=data.frame(bldg.type=c("10", "13", "25", "28"))
-    type.price.sel=mh2009.sel%>%
-                group_by(bldg.type)%>%
-                summarise(
-                  price.mean=mean(sale.price, na.rm=T),
-                  price.median=median(sale.price, na.rm=T),
-                  unit.mean=mean(unit.price, na.rm=T),
-                  unit.median=median(unit.price, na.rm=T),
-                  sale.n=n()
-                )
-    type.price=left_join(type.price, type.price.sel, by="bldg.type")
-    
-    ## Making the plots
-    layout(matrix(c(1,1,1,1,2,2,3,3,2,2,3,3), 3, 4, byrow=T))
-    par(cex.axis=1.3, cex.lab=1.5, 
-        font.axis=2, font.lab=2, col.axis="dark gray", bty="n")
-    
-    ### Sales monthly counts
-    plot(1:12, month.v, xlab="Months", ylab="Total sales", 
-         type="b", pch=21, col="black", bg="red", 
-         cex=2, lwd=2, ylim=c(0, max(month.v,na.rm=T)*1.05))
-    
-    ### Price per square foot
-    plot(c(0, max(type.price[,c(4,5)], na.rm=T)), 
-         c(0,5), 
-         xlab="Price per square foot", ylab="", 
-         bty="l", type="n")
-    text(rep(0, 4), 1:4+0.5, paste(c("coops", "condos", "luxury hotels", "comm. condos"), 
-                                  type.price$sale.n, sep=": "), adj=0, cex=1.5)
-    points(type.price$unit.mean, 1:nrow(type.price), pch=16, col=2, cex=2)
-    points(type.price$unit.median, 1:nrow(type.price),  pch=16, col=4, cex=2)
-    segments(type.price$unit.mean, 1:nrow(type.price), 
-              type.price$unit.median, 1:nrow(type.price),
-             lwd=2)    
-    
-    ### full price
-    plot(c(0, max(type.price[,-1], na.rm=T)), 
-         c(0,5), 
-         xlab="Sales Price", ylab="", 
-         bty="l", type="n")
-    text(rep(0, 4), 1:4+0.5, paste(c("coops", "condos", "luxury hotels", "comm. condos"), 
-                                   type.price$sale.n, sep=": "), adj=0, cex=1.5)
-    points(type.price$price.mean, 1:nrow(type.price), pch=16, col=2, cex=2)
-    points(type.price$price.median, 1:nrow(type.price),  pch=16, col=4, cex=2)
-    segments(type.price$price.mean, 1:nrow(type.price), 
-             type.price$price.median, 1:nrow(type.price),
-             lwd=2)    
-  })
-  
-  ## Panel 2: map of sales distribution
-  output$distPlot1 <- renderPlot({
-    count.df.sel=count.df
-    if(input$nbhd>0){
-      count.df.sel=count.df%>%
-        filter(region %in% zip.nbhd[[as.numeric(input$nbhd)]])
-    }
-    # make the map for selected neighhoods
-    
-    zip_choropleth(count.df.sel,
-                   title       = "2009 Manhattan housing sales",
-                   legend      = "Number of sales",
-                   county_zoom = 36061)
-  })
-  
-  ## Panel 3: leaflet
-  output$map <- renderLeaflet({
-    count.df.sel=count.df
-    if(input$nbhd>0){
-      count.df.sel=count.df%>%
-        filter(region %in% zip.nbhd[[as.numeric(input$nbhd)]])
-    }
-    
-    # From https://data.cityofnewyork.us/Business/Zip-Code-Boundaries/i8iw-xf4u/data
-    NYCzipcodes <- readOGR("../data/ZIP_CODE_040114.shp",
-                           #layer = "ZIP_CODE", 
-                           verbose = FALSE)
-    
-    selZip <- subset(NYCzipcodes, NYCzipcodes$ZIPCODE %in% count.df.sel$region)
-    
-    # ----- Transform to EPSG 4326 - WGS84 (required)
-    subdat<-spTransform(selZip, CRS("+init=epsg:4326"))
-    
-    # ----- save the data slot
-    subdat_data=subdat@data[,c("ZIPCODE", "POPULATION")]
-    subdat.rownames=rownames(subdat_data)
-    subdat_data=
-      subdat_data%>%left_join(count.df, by=c("ZIPCODE" = "region"))
-    rownames(subdat_data)=subdat.rownames
-    
-    # ----- to write to geojson we need a SpatialPolygonsDataFrame
-    subdat<-SpatialPolygonsDataFrame(subdat, data=subdat_data)
-    
-    # ----- set uo color pallette https://rstudio.github.io/leaflet/colors.html
-    # Create a continuous palette function
-    pal <- colorNumeric(
-      palette = "Blues",
-      domain = subdat$POPULATION
+    ZIPCODE <- names(table(datasliced$Zip))
+    frequence <- unname(table(datasliced$Zip))
+    Zip <- as.data.frame(cbind(ZIPCODE, frequence))
+    under1 <- subset(under, is.element(Zip$ZIPCODE, under$ZIPCODE))
+    under2 <-
+      subset(under1, is.element(under1$ZIPCODE, Zip$ZIPCODE))
+    under2@data = merge(
+      x = under2@data,
+      y = Zip,
+      by = "ZIPCODE",
+      all.x = TRUE
+    )
+    subdat1 <- spTransform(under2, CRS("+init=epsg:4326"))
+    subdat1@data$frequence <- as.numeric(subdat1@data$frequence)
+    subdat1$lab <- paste(
+      "<p>",
+      "ZIPCODE: ",
+      subdat1$ZIPCODE,
+      "<p>",
+      "<p>",
+      "Number of litigations: ",
+      subdat1$frequence,
+      "<p>"
     )
     
-    leaflet(subdat) %>%
-      addTiles()%>%
+    pal <- colorNumeric(palette = "Blues",
+                        domain = subdat1$frequence)
+    
+    m <- leaflet(under) %>%
+      addProviderTiles(providers$Stamen.Toner) %>%
+      setView(lng = -73.98928,
+              lat = 40.75042,
+              zoom = 11) %>%
       addPolygons(
-        stroke = T, weight=1,
-        fillOpacity = 0.6,
-        color = ~pal(POPULATION)
+        data = subdat1,
+        weight = 1,
+        smoothFactor = 0.5,
+        color = "white",
+        fillOpacity = 0.8,
+        fillColor = pal(subdat1$frequence),
+        label = lapply(subdat1$lab, HTML),
+        highlight = highlightOptions(
+          weight = 10,
+          color = "White",
+          bringToFront = TRUE
+        )
       )
   })
-})
+  
+  ## Tab 2 output
+  
+  output$mymap_t2 <- renderLeaflet({
+    data <- filter(building_geo, n >= input$numlit_t2)
+    
+    m <- leaflet(data = data) %>%
+      addTiles() %>%
+      setView(lng = -73.9588,
+              lat = 40.74 ,
+              zoom = 11) %>%
+      addProviderTiles("CartoDB.Positron") %>%
+      addCircleMarkers(
+        lng = ~ Longitude,
+        lat = ~ Latitude,
+        popup = ~ paste0(
+          "Address: ",
+          HouseNumber,
+          " ",
+          StreetName,
+          "<br/>Litigations: " ,
+          n,
+          "<br/>Most Recent Respondent: " ,
+          Respondent
+        ),
+        radius = 4,
+        color = "blue",
+        fillColor = "white",
+        opacity = 0.5
+      )
+  })
+  
+  output$describe_t2 <- renderText({
+    paste(
+      "Click on map to choose a building, displays info on all buildings if no building selected"
+    )
+  })
+  
+  observe({
+    posi <<- reactive({
+      input$mymap_t2_marker_click
+    })
+  })
+  
+  observeEvent(input$building_t2, {
+    if (input$building_t2) {
+      if (is.null(posi())) {
+        plot_data <- data
+      } else{
+        plot_data <-
+          dplyr::filter(data, Latitude == posi()$lat, Longitude == posi()$lng)
+      }
+      
+      output$histogram_t2 <- renderPlotly({
+        ts_data <- plot_data
+        ts_data$CaseOpenDate <-
+          as.Date(ts_data$CaseOpenDate) %>% format("%Y")
+        ts_data <- group_by(ts_data, CaseOpenDate) %>% tally()
+        colnames(ts_data) <- c("Year", "Number of litigation")
+        
+        ts <-
+          ggplot(ts_data, aes(x = Year, y = `Number of litigation`)) +
+          geom_bar(stat = "identity") +
+          ggtitle("Amount of Litigations in each year") +
+          labs(x = "Years", y = "Number of litigation") + coord_flip()
+        ts <- ggplotly(ts)
+        ts
+      })
+      
+      output$pie_t2 <- renderPlotly({
+        plot_ly() %>%
+          add_pie(
+            data = count(plot_data, CaseType),
+            labels = ~ CaseType,
+            values = ~ n,
+            name = "Litigation by case types",
+            domain = list(x = c(0, 0.45), y = c(0, 1))
+          ) %>%
+          add_pie(
+            data = count(plot_data, CaseStatus),
+            labels = ~ CaseStatus,
+            values = ~ n,
+            name = "Status of the litigation",
+            domain = list(x = c(0.55, 1), y = c(0, 1))
+          ) %>%
+          layout(
+            title = "Litigation details (type and case status)",
+            showlegend = F,
+            xaxis = list(
+              showgrid = FALSE,
+              zeroline = FALSE,
+              showticklabels = FALSE
+            ),
+            yaxis = list(
+              showgrid = FALSE,
+              zeroline = FALSE,
+              showticklabels = FALSE
+            )
+          )
+        
+      })
+      
+    }
+    
+  })
+  
+  
+  ## Tab 3 output
+  
+  output$mymap_t3 <- renderLeaflet({
+    input$search_t3
+    data_t3 <-
+      filter(building_geo, Respondent == isolate(input$text_t3))
+    m <- leaflet(data = data_t3) %>%
+      addTiles() %>%
+      setView(lng = -73.9588,
+              lat = 40.74 ,
+              zoom = 11) %>%
+      addProviderTiles("CartoDB.Positron") %>%
+      addCircleMarkers(
+        lng = ~ Longitude,
+        lat = ~ Latitude,
+        popup = ~ paste0(
+          "Address: ",
+          HouseNumber,
+          " ",
+          StreetName,
+          "<br/>Litigations: " ,
+          n
+          
+        ),
+        radius = 4,
+        color = "red",
+        fillColor = "white",
+        opacity = 0.5
+      )
+  })
+  
+  
+  
+  output$histogram_t3 <- renderPlotly({
+    input$search_t3
+    data_t3 <-
+      filter(building_geo, Respondent == isolate(input$text_t3))
+    if (nrow(data_t3) == 0) {
+      return(NULL)
+    }
+    
+    ts_data_t3 <- group_by(data, BuildingID) %>% tally()
+    colnames(ts_data_t3) <-
+      c("BuildingID", "Number of litigations")
+    ts_data_t3 <-
+      group_by(ts_data_t3, `Number of litigations`) %>% tally()
+    colnames(ts_data_t3) <-
+      c("Number of litigations", "Number of buildings")
+    
+    ts_t3 <-
+      ggplot(ts_data_t3,
+             aes(x = `Number of litigations`, y = `Number of buildings`)) +
+      geom_bar(stat = "identity") +
+      ggtitle("Histogram of buildings per litigation number") +
+      labs(x = "Number of litigations", y = "Number of buildings") #+ coord_flip()
+    ts_t3 <- ggplotly(ts_t3)
+    ts_t3
+  })
+  
+  
+})# end of server
