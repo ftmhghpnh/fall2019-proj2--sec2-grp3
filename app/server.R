@@ -12,7 +12,7 @@ library(maptools)
 library(broom)
 library(httr)
 
-load('processed_data.RData')
+load('processed_data.Rdata')
 load('building_geo.RData')
 
 under <- readOGR(dsn = ".", layer = "ZIP_CODE_040114")
