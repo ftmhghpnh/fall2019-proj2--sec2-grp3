@@ -19,13 +19,13 @@ library(httr)
 ```
 
 ```{r}
-data1<-read.csv("../data/processed_data.csv")
+load('../output/processed_data.RData') 
 under <- readOGR("../data/ZIP_CODE_040114.shp")
 ```
 
 ```{r}
 ui <- fluidPage(
-  h1("Map of Frequences"),
+  h1("Litigation Overview by Case"),
   sidebarLayout(
     sidebarPanel(
        selectInput("Zip_frequence", "Case:",
@@ -55,42 +55,57 @@ ui <- fluidPage(
 
 ```{r}
 
-server=function(input, output) {
+
+server = function(input, output) {
   output$mymap1 <- renderLeaflet({
-    data1$CaseOpenDate <- as.Date(data1$CaseOpenDate) %>% format("%Y")
-    datasliced<-dplyr::filter(data1, data1$CaseType==input$Zip_frequence, data1$CaseOpenDate==input$CaseOpenDate)
-      #data1[data1$CaseType==input$Zip_frequence,]
+    data$CaseOpenDate <- as.Date(data$CaseOpenDate) %>% format("%Y")
+    datasliced <-
+      dplyr::filter(
+        data,
+        data$CaseType == input$Zip_frequence,
+        data$CaseOpenDate == input$CaseOpenDate
+      )
     
-    ZIPCODE<-names(table(datasliced$Zip))
-    frequence<-unname(table(datasliced$Zip))
-    Zip<-as.data.frame(cbind(ZIPCODE,frequence))
+    ZIPCODE <- names(table(datasliced$Zip))
+    frequence <- unname(table(datasliced$Zip))
+    Zip <- as.data.frame(cbind(ZIPCODE, frequence))
     under1 <- subset(under, is.element(Zip$ZIPCODE, under$ZIPCODE))
-    under2 <- subset(under1, is.element(under1$ZIPCODE, Zip$ZIPCODE))
-    under2@data = merge(x=under2@data, y=Zip, by = "ZIPCODE", all.x = TRUE)
+    under2 <-
+      subset(under1, is.element(under1$ZIPCODE, Zip$ZIPCODE))
+    under2@data = merge(
+      x = under2@data,
+      y = Zip,
+      by = "ZIPCODE",
+      all.x = TRUE
+    )
     subdat1 <- spTransform(under2, CRS("+init=epsg:4326"))
     subdat1@data$frequence <- as.numeric(subdat1@data$frequence)
     
-    pal <- colorNumeric(
-       palette = "Blues",
-       domain = subdat1$frequence
-       )
-
+    pal <- colorNumeric(palette = "Blues",
+                        domain = subdat1$frequence)
+    
     m <- leaflet(under) %>%
       addProviderTiles(providers$Stamen.Toner) %>%
-      setView(lng = -73.98928, lat = 40.75042, zoom = 12)%>% 
-      addPolygons(data = subdat1,
-                  weight = 1,
-                  smoothFactor = 0.5,
-                  color = "white",
-                  fillOpacity = 0.8,
-                  fillColor = pal(subdat1$frequence),
-                  label = ~paste0("Zipcode:", ZIPCODE,
-                                  #"Boro Number", Boro,
-                                  "Case Frequence: ", frequence),
-                  highlight = highlightOptions(weight = 10,
-                                       color = "White",
-                                       bringToFront = TRUE))})
-  }
+      setView(lng = -73.98928,
+              lat = 40.75042,
+              zoom = 12) %>%
+      addPolygons(
+        data = subdat1,
+        weight = 1,
+        smoothFactor = 0.5,
+        color = "white",
+        fillOpacity = 0.8,
+        fillColor = pal(subdat1$frequence),
+        label = ~ paste0("Zipcode:", ZIPCODE,
+                         "Number of Cases: ", frequence),
+        highlight = highlightOptions(
+          weight = 10,
+          color = "White",
+          bringToFront = TRUE
+        )
+      )
+  })
+}
     
 ```
 
