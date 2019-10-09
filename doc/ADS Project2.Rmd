@@ -20,7 +20,7 @@ library(httr)
 
 ```{r}
 data1<-read.csv("../data/processed_data.csv")
-under <- readOGR("../data/ZipcodeShapeFile/ZIP_CODE_040114.shp")
+under <- readOGR("../data/ZIP_CODE_040114.shp")
 ```
 
 ```{r}
