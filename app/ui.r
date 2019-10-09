@@ -3,6 +3,7 @@
 library(ggplot2)
 library(leaflet)
 library(shiny)
+library(plotly)
 
 
 navbarPage(
@@ -78,6 +79,7 @@ navbarPage(
           min = 5,
           max = 90,
           value = 25
+          
         ),
         actionButton("building_t2", "See/Update Building Details"),
         textOutput("describe_t2"),

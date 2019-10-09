@@ -1,5 +1,4 @@
 
-
 library(tidyverse)
 library(leaflet)
 library(shiny)
@@ -13,13 +12,10 @@ library(maptools)
 library(broom)
 library(httr)
 
-load('../output/processed_data.RData')
+load('processed_data.RData')
+load('building_geo.RData')
 
-load('../output/building_geo.RData')
-
-
-under <- readOGR("../data/ZIP_CODE_040114.shp")
-
+under <- readOGR(dsn = ".", layer = "ZIP_CODE_040114")
 
 shinyServer(function(input, output) {
   ## Tab 1 output
