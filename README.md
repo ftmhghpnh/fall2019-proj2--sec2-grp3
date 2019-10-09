@@ -15,7 +15,7 @@ Term: Fall 2019
 
 + **Project summary**: 
 
-This app contains three topics, including litigations overview, buildings details, and respondents search. The team uses [Housing Litigations](https://data.cityofnewyork.us/Housing-Development/Housing-Litigations/59kj-x8nc) dataset from NYC OpenData. The analysis covers NYC buildings ID, location information, and related respondent information between year 2000 and 2019.
+This app contains three topics, including litigations overview, buildings details, and respondents search. The team uses [Housing Litigations](https://data.cityofnewyork.us/Housing-Development/Housing-Litigations/59kj-x8nc) dataset from NYC OpenData. The analysis covers NYC buildings ID, location information, and related respondent information between year 2000 and 2019. This topic is excluded from “suggested" list.
 
 The first tab shows litigations overview by case types(i.e.Comprehensive) and open year(i.e.2019) selected. By choosing specific case type and status, a colored map is produced based on different zipcodes. The deeper the color, the higher frequency litigations exist in that area. Therefore, users could compare the difference in color directly from map to get information about litigations frequency.
 
@@ -25,7 +25,15 @@ The third tab takes care of respondents. User might type in the name of responde
 
 The last two tabs are Appendix. Appendix A is about case development and Appendix B is housing litigation procedure, which illustrate structure of how litigation proceed further to help users better understand case types. 
 
-+ **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
++ **Contribution statement**: 
+
++ Chen, Yanzhu: brainstorm, data cleaning, tab 1 litigation overview(25%), readme
++ Haghpanah, Fateme Sadat: brainstorm, tab 3 respondent
++ Hao, Sixing: brainstorm, tab 2 building, leader
++ Lu, Haotian: brainstorm, Appendix, tab 1 litigation overview(25%)
++ Yang, Nan: brainstorm, tab 1 litigation overview(50%)
+
+All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
 Following [suggestions](http://nicercode.github.io/blog/2013-04-05-projects/) by [RICH FITZJOHN](http://nicercode.github.io/about/#Team) (@richfitz). This folder is orgarnized as follows.
 
