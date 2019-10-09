@@ -24,9 +24,7 @@ library(httr)
 
 load('../output/processed_data.RData') 
 
-load('../output/building_geo.RData') 
-load('../output/building_geo_t2.RData')
-
+load('../output/building_geo.RData')
 under <- readOGR("../data/ZIP_CODE_040114.shp")
 
 ```
@@ -96,7 +94,7 @@ ui <- navbarPage(
           "numlit_t2",
           "Amount of litigations",
           min = 5,
-          max = max(building_geo_t2$n),
+          max = max(building_geo$n),
           value = 25
         ),
         actionButton("building_t2", "See/Update Building Details"),

@@ -43,8 +43,5 @@ building <- data %>% group_by(BuildingID) %>% tally()
 geo <- data %>% dplyr::select(BuildingID, Latitude, Longitude, StreetName, HouseNumber, Respondent)
 building_geo <- left_join(lit_building, lit_geo, by = "BuildingID")
 save(building_geo, file="../output/building_geo.RData")
-
-building_geo_t2 <-building_geo %>% distinct(BuildingID, .keep_all = T)
-save(building_geo_t2, file="../output/building_geo_t2.RData")
 ```
 

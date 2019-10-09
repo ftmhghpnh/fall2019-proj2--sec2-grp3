@@ -76,7 +76,7 @@ navbarPage(
           "numlit_t2",
           "Amount of litigations",
           min = 5,
-          max = max(building_geo_t2$n),
+          max = 90,
           value = 25
         ),
         actionButton("building_t2", "See/Update Building Details"),
