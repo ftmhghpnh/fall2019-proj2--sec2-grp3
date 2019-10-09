@@ -3,16 +3,17 @@
 ## Project Title: Housing Litigations
 Term: Fall 2019
 
-+ Team # 3
-+  + Team members
++ Team: Group 3
++ Team members
 	+ Chen, Yanzhu
 	+ Haghpanah, Fateme Sadat
 	+ Hao, Sixing
 	+ Lu, Haotian
 	+ Yang, Nan
 
-+ Link to Shiny App: (https://sh3799.shinyapps.io/HousingLitigations/)
-+ **Project summary**: 
++ Link to Shiny App: https://sh3799.shinyapps.io/HousingLitigations/
+
++ **Project summary**: This app contains three
 
 + **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
