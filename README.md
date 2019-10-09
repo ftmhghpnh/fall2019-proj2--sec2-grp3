@@ -14,6 +14,7 @@ Term: Fall 2019
 + Link to Shiny App: https://sh3799.shinyapps.io/HousingLitigations/
 
 + **Project summary**: 
+
 This app contains three topics, including litigations overview, buildings details, and respondents search. The team uses [Housing Litigations](https://data.cityofnewyork.us/Housing-Development/Housing-Litigations/59kj-x8nc) dataset from NYC OpenData. The analysis covers NYC buildings ID, location information, and related respondent information between year 2000 and 2019.
 
 The first tab shows litigations overview by case types(i.e.Comprehensive) and open year(i.e.2019) selected. By choosing specific case type and status, a colored map is produced based on different zipcodes. The deeper the color, the higher frequency litigations exist in that area. Therefore, users could compare the difference in color directly from map to get information about litigations frequency.
