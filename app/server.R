@@ -220,12 +220,12 @@ shinyServer(function(input, output) {
   output$histogram_t3 <- renderPlotly({
     input$search_t3
     data_t3 <-
-      filter(building_geo, Respondent == isolate(input$text_t3)) %>% distinct()
+      filter(building_geo, Respondent == isolate(input$text_t3))
     if (nrow(data_t3) == 0) {
       return(NULL)
     }
     
-    ts_data_t3 <- group_by(data_t3, BuildingID) %>% tally()
+    ts_data_t3 <- group_by(data_t3, BuildingID) %>% count()
     colnames(ts_data_t3) <-
       c("BuildingID", "Number of litigations")
     ts_data_t3 <-
@@ -237,7 +237,7 @@ shinyServer(function(input, output) {
       ggplot(ts_data_t3,
              aes(x = `Number of litigations`, y = `Number of buildings`)) +
       geom_bar(stat = "identity") +
-      ggtitle("Histogram of buildings per litigation number") +
+      ggtitle("Buildings per litigation number") +
       labs(x = "Number of litigations", y = "Number of buildings") +
       theme(plot.title = element_text(size = 12, face = "bold"))
     ts_t3 <- ggplotly(ts_t3)
