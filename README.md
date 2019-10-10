@@ -27,11 +27,11 @@ The last two tabs are Appendix. Appendix A is about case development and Appendi
 
 + **Contribution statement**: 
 
-+ Chen, Yanzhu: brainstorm, data cleaning, tab 1 litigation overview(25%), readme
++ Chen, Yanzhu: brainstorm, data cleaning, tab 1 litigation overview(20%), readme
 + Haghpanah, Fateme Sadat: brainstorm, tab 3 respondent
 + Hao, Sixing: brainstorm, tab 2 building, leader
-+ Lu, Haotian: brainstorm, Appendix, tab 1 litigation overview(25%)
-+ Yang, Nan: brainstorm, tab 1 litigation overview(50%)
++ Lu, Haotian: brainstorm, Appendix, tab 1 litigation overview(20%)
++ Yang, Nan: brainstorm, tab 1 litigation overview(60%)
 
 All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
