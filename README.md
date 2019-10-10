@@ -27,10 +27,10 @@ The last two tabs are Appendix. Appendix A is about case development and Appendi
 
 + **Contribution statement**: 
 
-+ Chen, Yanzhu: brainstorm, data cleaning, tab 1 litigation overview(20%), readme
++ Chen, Yanzhu: brainstorm, data cleaning, tab 1 litigation overview(20%), readme file editing
 + Haghpanah, Fateme Sadat: brainstorm, tab 3 respondent
-+ Hao, Sixing: brainstorm, tab 2 building, leader
-+ Lu, Haotian: brainstorm, Appendix, tab 1 litigation overview(20%)
++ Hao, Sixing (leader): brainstorm, tab 2 building, merging all tabs together, upload and deploy shinyapp
++ Lu, Haotian: brainstorm, Appendix A&B, tab 1 litigation overview(20%)
 + Yang, Nan: brainstorm, tab 1 litigation overview(60%)
 
 All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
