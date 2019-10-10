@@ -5,8 +5,8 @@ account: sh3799
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1307992
-bundleId: 2485027
+bundleId: 2486135
 url: https://sh3799.shinyapps.io/HousingLitigations/
-when: 1570648343.30065
+when: 1570675478.57188
 asMultiple: FALSE
 asStatic: FALSE

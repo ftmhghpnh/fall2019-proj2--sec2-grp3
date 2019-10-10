@@ -357,12 +357,12 @@ server <- function(input, output){
   
   output$histogram_t3 <- renderPlotly({
     input$search_t3
-    data_t3 <- filter(building_geo, Respondent == isolate(input$text_t3))
+    data_t3 <- filter(building_geo, Respondent == isolate(input$text_t3)) %>% distinct()
     if (nrow(data_t3) == 0) {
       return(NULL)
     }
     
-    ts_data_t3 <- group_by(data, BuildingID) %>% tally()
+    ts_data_t3 <- group_by(data_t3, BuildingID) %>% tally()
     colnames(ts_data_t3) <-
       c("BuildingID", "Number of litigations")
     ts_data_t3 <-

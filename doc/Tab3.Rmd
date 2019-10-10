@@ -50,8 +50,8 @@ server <- function(input, output) {
   
   output$mymap_t3 <- renderLeaflet({
     input$search_t3
-    data <- filter(building_geo, Respondent == isolate(input$text_t3))
-    m <- leaflet(data = data) %>%
+    data_t3 <- filter(building_geo, Respondent == isolate(input$text_t3))
+    m <- leaflet(data = data_t3) %>%
       addTiles() %>%
       setView(lng = -73.9588,
               lat = 40.74 ,
@@ -80,7 +80,7 @@ server <- function(input, output) {
   
   output$histogram_t3 <- renderPlotly({
     input$search_t3
-    data_t3 <- filter(building_geo, Respondent == isolate(input$text_t3))
+    data_t3 <- filter(building_geo, Respondent == isolate(input$text_t3)) %>% distinct()
     if (nrow(data_t3) == 0) {
       return(NULL)
     }
@@ -108,3 +108,4 @@ server <- function(input, output) {
 shinyApp(ui, server)
 
 ```
+
