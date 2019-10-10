@@ -16,8 +16,10 @@ library(leaflet)
 library(shiny)
 library(plotly)
 
-load('../output/processed_data.RData')
-load('../output/building_geo.RData')
+lit <- read.csv("../data/processed_data.csv")
+lit_landlord <- lit %>% group_by(BuildingID) %>% tally()
+lit_geo <- lit %>% dplyr::select(BuildingID, Latitude, Longitude, StreetName, HouseNumber, Respondent)
+lit_landlord_geo <- left_join(lit_landlord, lit_geo, by = "BuildingID")
 ```
 
 
@@ -50,7 +52,7 @@ server <- function(input, output) {
   
   output$mymap_t3 <- renderLeaflet({
     input$search_t3
-    data_t3 <- filter(building_geo, Respondent == isolate(input$text_t3))
+    data_t3 <- filter(lit_landlord_geo, Respondent == isolate(input$text_t3))
     m <- leaflet(data = data_t3) %>%
       addTiles() %>%
       setView(lng = -73.9588,
@@ -80,7 +82,7 @@ server <- function(input, output) {
   
   output$histogram_t3 <- renderPlotly({
     input$search_t3
-    data_t3 <- filter(building_geo, Respondent == isolate(input$text_t3)) %>% distinct()
+    data_t3 <- filter(lit_landlord_geo, Respondent == isolate(input$text_t3))
     if (nrow(data_t3) == 0) {
       return(NULL)
     }
