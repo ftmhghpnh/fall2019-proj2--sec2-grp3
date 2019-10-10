@@ -238,7 +238,8 @@ shinyServer(function(input, output) {
              aes(x = `Number of litigations`, y = `Number of buildings`)) +
       geom_bar(stat = "identity") +
       ggtitle("Histogram of buildings per litigation number") +
-      labs(x = "Number of litigations", y = "Number of buildings") #+ coord_flip()
+      labs(x = "Number of litigations", y = "Number of buildings") +
+      theme(plot.title = element_text(size = 12, face = "bold"))
     ts_t3 <- ggplotly(ts_t3)
     ts_t3
   })
