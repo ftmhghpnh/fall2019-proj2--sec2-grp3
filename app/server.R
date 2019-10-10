@@ -225,7 +225,7 @@ shinyServer(function(input, output) {
       return(NULL)
     }
     
-    ts_data_t3 <- group_by(data, BuildingID) %>% tally()
+    ts_data_t3 <- group_by(data_t3, BuildingID) %>% tally()
     colnames(ts_data_t3) <-
       c("BuildingID", "Number of litigations")
     ts_data_t3 <-
