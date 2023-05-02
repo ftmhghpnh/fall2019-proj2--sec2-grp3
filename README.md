@@ -6,7 +6,7 @@ Term: Fall 2019
 + Team: Group 3
 + Team members
 	+ Chen, Yanzhu
-	+ Haghpanah, Fateme Sadat
+	+ **Haghpanah, Fateme Sadat**
 	+ Hao, Sixing
 	+ Lu, Haotian
 	+ Yang, Nan
